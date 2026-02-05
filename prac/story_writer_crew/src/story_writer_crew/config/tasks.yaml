@@ -1,0 +1,51 @@
+# src/story_writer_crew/config/tasks.yaml
+# 定义故事创作流程中的各个任务
+
+# 任务1: 故事大纲创作
+outline_task:
+  description: >
+    基于 {theme} 这个主题，创作一个完整的故事大纲。
+    大纲应包含：
+    1. 故事背景和设定
+    2. 主要人物介绍（至少3个角色）
+    3. 完整的故事情节（开端、发展、高潮、结局）
+    4. 核心冲突和主题思想
+    请确保大纲富有创意且逻辑自洽。
+  expected_output: >
+    一个结构完整的故事大纲，包含故事背景、人物小传、
+    情节大纲和主题分析，字数约800-1000字。
+  agent: story_ideator
+
+# 任务2: 故事撰写
+writing_task:
+  description: >
+    根据故事大纲，撰写一篇完整的故事。
+    故事应该：
+    1. 紧扣大纲中的情节发展
+    2. 使用生动的描写和对话
+    3. 展现人物性格和情感
+    4. 营造恰当的氛围和节奏
+    5. 故事长度控制在2000-3000字
+  expected_output: >
+    一篇完整的故事，情节生动、人物鲜活、语言优美，
+    格式为 Markdown，使用恰当的标题和分段。
+  agent: story_writer
+  context: [outline_task]
+  output_file: story_draft.md
+
+# 任务3: 编辑润色
+editing_task:
+  description: >
+    审阅并润色已完成的故事草稿。
+    审阅要点：
+    1. 检查并修正语法、标点错误
+    2. 优化表达，使文字更流畅
+    3. 调整段落结构和节奏
+    4. 确保人物塑造和情节发展一致
+    5. 提供改进建议和最终版本
+  expected_output: >
+    经过专业编辑润色的最终版故事，以及一份编辑说明，
+    列出主要的修改内容和改进建议。格式为 Markdown。
+  agent: story_editor
+  context: [writing_task]
+  output_file: story_final.md

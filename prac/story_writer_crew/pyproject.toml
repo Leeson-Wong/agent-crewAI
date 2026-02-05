@@ -1,0 +1,22 @@
+[project]
+name = "story_writer_crew"
+version = "0.1.0"
+description = "一个使用 CrewAI 创建的故事写作团队"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai",
+    "crewai-tools",
+]
+
+[project.scripts]
+story-writer = "story_writer_crew.main:run"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"
