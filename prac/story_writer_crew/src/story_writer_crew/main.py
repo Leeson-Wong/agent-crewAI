@@ -4,9 +4,56 @@
 
 这个程序运行一个由多个 AI Agent 组成的故事创作团队，
 包括故事策划、写作和编辑三个角色。
+
+监控功能：
+    - 启用后，会自动发送 Agent 事件到监控服务器
+    - 设置环境变量：
+        export AGENT_MONITOR_ENABLED=true
+        export AGENT_MONITOR_URL=http://localhost:8080
 """
 import sys
 from story_writer_crew.crew import StoryWriterCrew  # 相对导入，因为在同一包内
+
+# ==================== 监控插件导入 ====================
+# 尝试导入监控插件（如果已安装）
+try:
+    from agent_monitor import CrewAIPlugin
+    MONITOR_AVAILABLE = True
+    print("[INFO] Agent Monitor Plugin 已加载")
+except ImportError:
+    MONITOR_AVAILABLE = False
+    print("[INFO] Agent Monitor Plugin 未安装，监控功能不可用")
+# ===========================================================
+
+
+def setup_monitor():
+    """
+    设置监控插件
+
+    检查环境变量，如果启用了监控，则自动安装插件
+    """
+    if not MONITOR_AVAILABLE:
+        return
+
+    import os
+
+    # 检查是否启用监控
+    if not os.getenv("AGENT_MONITOR_ENABLED"):
+        print("[INFO] 监控未启用 (设置 AGENT_MONITOR_ENABLED=true 来启用)")
+        return
+
+    monitor_url = os.getenv("AGENT_MONITOR_URL")
+    if not monitor_url:
+        print("[WARN] AGENT_MONITOR_URL 未设置，监控功能无法使用")
+        return
+
+    # 安装插件
+    try:
+        plugin = CrewAIPlugin(monitor_url=monitor_url)
+        plugin.install()
+        print(f"[INFO] 监控已启用 -> {monitor_url}")
+    except Exception as e:
+        print(f"[ERROR] 监控插件安装失败: {e}")
 
 
 def run():
@@ -15,6 +62,9 @@ def run():
 
     这个函数创建并执行一个故事创作团队，生成一篇完整的故事。
     """
+    # 设置监控（如果启用）
+    setup_monitor()
+
     # 定义输入参数
     inputs = {
         'theme': '时间旅行与遗憾',  # 故事主题
@@ -73,8 +123,10 @@ def run_for_each(inputs_list: list[dict]):
     Args:
         inputs_list: 输入参数列表
     """
-    story_crew = StoryWriterCrew()
+    # 设置监控
+    setup_monitor()
 
+    story_crew = StoryWriterCrew()
     results = story_crew.crew().kickoff_for_each(inputs=inputs_list)
 
     for i, result in enumerate(results):
@@ -91,6 +143,9 @@ def train():
 
     这个函数可以用来优化 Agent 的性能。
     """
+    # 设置监控
+    setup_monitor()
+
     inputs = {
         'theme': '科幻冒险',
     }
@@ -116,6 +171,9 @@ def test():
 
     这个函数用于测试 Crew 的性能和输出质量。
     """
+    # 设置监控
+    setup_monitor()
+
     inputs = {
         'theme': '测试主题',
     }
@@ -152,6 +210,9 @@ class StoryWriterCrewCLI:
 
         这个模式允许你多次输入主题，让 Crew 生成多个故事。
         """
+        # 设置监控
+        setup_monitor()
+
         story_crew = StoryWriterCrew()
 
         print("=" * 60)
