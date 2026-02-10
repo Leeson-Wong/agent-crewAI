@@ -15,14 +15,35 @@ import sys
 from story_writer_crew.crew import StoryWriterCrew  # 相对导入，因为在同一包内
 
 # ==================== 监控插件导入 ====================
-# 尝试导入监控插件（如果已安装）
+# 尝试从多个可能的路径导入监控插件
+MONITOR_AVAILABLE = False
+CrewAIPlugin = None
+
+# 方式1: 从已安装的包导入
 try:
-    from agent_monitor import CrewAIPlugin
+    from agent_monitor.plugins.crewai_plugin import CrewAIPlugin
     MONITOR_AVAILABLE = True
-    print("[INFO] Agent Monitor Plugin 已加载")
+    print("[INFO] Agent Monitor Plugin 已加载 (pip install)")
 except ImportError:
-    MONITOR_AVAILABLE = False
-    print("[INFO] Agent Monitor Plugin 未安装，监控功能不可用")
+    # 方式2: 从本地相对路径导入
+    try:
+        import sys
+        sys.path.insert(0, '../../agent-monitor-plugin/src')
+        from agent_monitor.plugins.crewai_plugin import CrewAIPlugin
+        MONITOR_AVAILABLE = True
+        print("[INFO] Agent Monitor Plugin 已加载 (local source)")
+    except ImportError:
+        # 方式3: 从项目根目录导入
+        try:
+            import sys
+            sys.path.insert(0, '../../../agent-monitor-plugin/src')
+            from agent_monitor.plugins.crewai_plugin import CrewAIPlugin
+            MONITOR_AVAILABLE = True
+            print("[INFO] Agent Monitor Plugin 已加载 (project root)")
+        except ImportError:
+          print("[WARN] Agent Monitor Plugin 未找到")
+          print("[INFO] 监控功能将不可用")
+          print("[INFO] 安装方法: pip install agent-monitor-plugin")
 # ===========================================================
 
 
